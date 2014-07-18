@@ -13,4 +13,4 @@ On most BSD/Linux distributions `dumpcap` comes suid'd so one does not need root
 You may be interested in [gopacket](https://code.google.com/p/gopacket/) to dissect network data from within go.
 
 
-[![GoDoc](https://godoc.org/github.com/lukaslueg/dumpcap?status.svg)](https://godoc.org/github.com/lukaslueg/dumpcap)
+[![GoDoc](https://godoc.org/github.com/lukaslueg/dumpcap?status.svg)](https://godoc.org/github.com/lukaslueg/dumpcap) [![Build Status](https://travis-ci.org/lukaslueg/dumpcap.svg?branch=master)](https://travis-ci.org/lukaslueg/dumpcap)
