@@ -32,6 +32,8 @@ const (
 	SuccessMsg          = 83 // Dumpcap reports success execution.
 )
 
+// PipeMessage represents messages send by dumpcap to inform about various
+// events.
 type PipeMessage struct {
 	Type        byte   // One of BadFilterMsg, ErrMsg, etc.
 	DropCount   uint64 // The absolute number of packets dropped. Only filled for DropCountMsg.
@@ -39,7 +41,7 @@ type PipeMessage struct {
 	Text        string // Contains the message's text for BadFilterMsg, ErrMsg and SuccessMsg; contains the filename for FileMsg.
 }
 
-// Device types reported by dumpcap.
+// DeviceType represents device types like USB or WiFi as reported by dumpcap.
 type DeviceType uint8
 
 // Known device types. Taken from capture_ifinfo.h and hopefully not subject to

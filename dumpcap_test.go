@@ -24,8 +24,8 @@ const (
 	gibberish    = "foobar\n"
 )
 
-var failStartErr = errors.New("Some error while starting the subprocess")
-var failExitErr = errors.New("Dumpcap returned nonzero exit status")
+var errFailStart = errors.New("Some error while starting the subprocess")
+var errFailExit = errors.New("Dumpcap returned nonzero exit status")
 
 func generateMsg(msgType uint8, msgText string) []byte {
 	msgText += "\x00"
@@ -97,7 +97,7 @@ func (c *mockCommand) Start() error {
 	if c.failStart {
 		close(c.stdout.pipe)
 		close(c.stderr.pipe)
-		return failStartErr
+		return errFailStart
 	}
 
 	go func() {
@@ -127,7 +127,7 @@ func (c *mockCommand) StderrPipe() (io.ReadCloser, error) {
 
 func (c *mockCommand) Wait() error {
 	if c.failExit {
-		return failExitErr
+		return errFailExit
 	}
 	return nil
 }
@@ -227,14 +227,14 @@ func TestVersion(t *testing.T) {
 
 func TestVersionFailsToStart(t *testing.T) {
 	d := newMockcap(mockFailStartArg)
-	if v, err := d.Version(); v != "" || err != failStartErr {
+	if v, err := d.Version(); v != "" || err != errFailStart {
 		t.Error(v, err)
 	}
 }
 
 func TestVersionFails(t *testing.T) {
 	d := newMockcap(mockFailExitArg)
-	if _, err := d.Version(); err != failExitErr {
+	if _, err := d.Version(); err != errFailExit {
 		t.Error(err)
 	}
 }
@@ -296,7 +296,7 @@ func TestCaptureBadFilter(t *testing.T) {
 
 func TestStatisticsFailsStart(t *testing.T) {
 	d := newMockcap(mockFailStartArg)
-	if _, err := d.NewStatistics(); err != failStartErr {
+	if _, err := d.NewStatistics(); err != errFailStart {
 		t.Error(err)
 	}
 }
@@ -353,7 +353,7 @@ func TestStatisticsIllegalOutput(t *testing.T) {
 
 func TestDevicesFailsStart(t *testing.T) {
 	d := newMockcap(mockFailStartArg)
-	if _, err := d.Devices(false); err != failStartErr {
+	if _, err := d.Devices(false); err != errFailStart {
 		t.Error(err)
 	}
 }
@@ -387,7 +387,7 @@ func TestDevices(t *testing.T) {
 func TestCapabilitiesFailsStart(t *testing.T) {
 	d := newMockcap(mockFailStartArg)
 	dev := Device{Name: "devX"}
-	if err := d.Capabilities(&dev, false); err != failStartErr {
+	if err := d.Capabilities(&dev, false); err != errFailStart {
 		t.Error(err)
 	}
 }
@@ -475,9 +475,8 @@ func TestBuildArgs(t *testing.T) {
 		DeviceArgs: []DeviceArgument{{CaptureFilter: "barfoo",
 			DisablePromiscuousMode: true, KernelBufferSize: 456,
 			LinkLayerType: "llt", Name: "dev1"}}}
-	arg_string := strings.Join(args.buildArgs(), " ")
-	if arg_string != "-S -C 123 -f foobar -I -n -a duration:60 -b files:5 -i dev1 -p -B 456 -y llt" {
-		t.Error(arg_string)
+	argString := strings.Join(args.buildArgs(), " ")
+	if argString != "-S -C 123 -f foobar -I -n -a duration:60 -b files:5 -i dev1 -p -B 456 -y llt" {
+		t.Error(argString)
 	}
-
 }

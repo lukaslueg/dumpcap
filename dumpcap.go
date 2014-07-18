@@ -341,7 +341,7 @@ type Statistics struct {
 func parseStatisticsLine(line string) (devname string, packetcount, dropcount uint64, err error) {
 	cols := strings.SplitN(line, "\t", 3)
 	if len(cols) != 3 {
-		return "", 0, 0, errors.New("Illegal output from dumpcap")
+		return "", 0, 0, errors.New("illegal output from dumpcap")
 	}
 	devname = cols[0]
 	packetcount, err = strconv.ParseUint(cols[1], 10, 64)
@@ -433,7 +433,7 @@ func (s Statistics) Close() {
 func parseDevicesLine(fields []string) (dev *Device, err error) {
 	dev = &Device{}
 	if len(fields) != 8 {
-		return nil, errors.New("Illegal output from dumpcap")
+		return nil, errors.New("illegal output from dumpcap")
 	}
 
 	i, err := strconv.ParseUint(fields[1], 10, 0)
@@ -501,7 +501,7 @@ func parseCapabilities(pipe io.Reader) (canRFMon bool, llts []LinkLayerType, err
 	for scanner.Scan() {
 		cols := strings.SplitN(scanner.Text(), "\t", 3)
 		if len(cols) != 3 {
-			return canRFMon, nil, errors.New("Illegal output from dumcap")
+			return canRFMon, nil, errors.New("illegal output from dumcap")
 		}
 		llt := LinkLayerType{}
 		i, err := strconv.ParseUint(cols[0], 10, 0)
