@@ -24,8 +24,8 @@ const (
 	gibberish    = "foobar\n"
 )
 
-var errFailStart = errors.New("Some error while starting the subprocess")
-var errFailExit = errors.New("Dumpcap returned nonzero exit status")
+var errFailStart = errors.New("some error while starting the subprocess")
+var errFailExit = errors.New("dumpcap returned nonzero exit status")
 
 func generateMsg(msgType uint8, msgText string) []byte {
 	msgText += "\x00"
