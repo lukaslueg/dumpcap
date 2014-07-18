@@ -1,5 +1,9 @@
 language: go
 
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq libpcap-dev
+
 go:
   - 1.0
   - 1.1
