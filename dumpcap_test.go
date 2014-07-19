@@ -85,6 +85,8 @@ func (c *mockCommand) mockedStatsCmd() {
 func (c *mockCommand) mockedCaptureCmd() {
 	if c.failOutput == mockFailFilterArg {
 		writePipe(c.stderr.pipe, generateMsg(BadFilterMsg, errText1))
+	} else if c.failOutput == mockIllegalOutputArg {
+		writePipe(c.stderr.pipe, []byte(gibberish))
 	} else {
 		writePipe(c.stderr.pipe, generateMsg(FileMsg, "foobar"))
 		writePipe(c.stderr.pipe, generateMsg(PacketCountMsg, "123"))
@@ -250,6 +252,22 @@ func TestVersionStringFails(t *testing.T) {
 	d := newMockcap(mockFailExitArg)
 	if v := d.VersionString(); v != UnknownVersion {
 		t.Error(v)
+	}
+}
+
+func TestCaptureFails(t *testing.T) {
+	d := newMockcap(mockIllegalOutputArg)
+	var c *Capture
+	var err error
+	if c, err = d.NewCapture(Arguments{}); err != nil {
+		t.Fatal(err)
+	}
+	_, ok := <-c.Messages
+	if ok {
+		t.Error("there should be no mesage, the channel closed")
+	}
+	if err = c.Wait(); err != errUnknownMessageType {
+		t.Error(err)
 	}
 }
 

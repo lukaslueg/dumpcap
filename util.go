@@ -32,6 +32,8 @@ const (
 	SuccessMsg          = 83 // Dumpcap reports success execution.
 )
 
+var errUnknownMessageType = errors.New("unknown message type")
+
 // PipeMessage represents messages send by dumpcap to inform about various
 // events.
 type PipeMessage struct {
@@ -143,6 +145,12 @@ func parsePipeMsg(input io.Reader) (msgType uint8, msg []byte, err error) {
 	}
 
 	msgType = buffer[0]
+	switch msgType {
+	case BadFilterMsg, DropCountMsg, ErrMsg, FileMsg, PacketCountMsg, QuitMsg, SuccessMsg:
+	default:
+		return 0, nil, errUnknownMessageType
+	}
+
 	msgSize := (int(buffer[1]) << 16) | (int(buffer[2]) << 8) | (int(buffer[3]) << 0)
 	if msgSize == 0 {
 		return msgType, nil, nil

@@ -277,13 +277,13 @@ func (d *Dumpcap) NewCapture(args Arguments) (*Capture, error) {
 		for {
 			msg, err := readPipeMsg(c.stderr)
 			if err != nil {
-				if _, ok := err.(*os.PathError); ok || err == io.EOF {
+				if _, ok := err.(*os.PathError); !ok && err != io.EOF {
 					// os.PathError caused by us closing the pipe while reading
 					// from it. This is not an error, dumpcap is about to exit.
 					// EOF means pipe was closed by dumpcap, also not an error.
-					return
+					c.exitStatus <- err
 				}
-				c.exitStatus <- err
+				return
 			}
 			select {
 			case c.Messages <- *msg:
