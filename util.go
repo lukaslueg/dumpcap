@@ -6,6 +6,7 @@ import (
 	"io"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 // used to decode the output of "dumpcap -D -M"
@@ -160,9 +161,6 @@ func parsePipeMsg(input io.Reader) (msgType uint8, msg []byte, err error) {
 	if err != nil {
 		return 0, nil, err
 	}
-	if len(buffer) > 0 && buffer[len(buffer)-1] == 0 {
-		buffer = buffer[:len(buffer)-1]
-	}
 	return msgType, buffer, nil
 }
 
@@ -178,7 +176,7 @@ func parsePipeErrMsg(input io.Reader) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return string(err1) + string(err2), nil
+	return strings.TrimSuffix(string(err1), "\x00") + strings.TrimSuffix(string(err2), "\x00"), nil
 }
 
 // readPipeMsg completely decodes a message sent by dumpcap.
@@ -189,7 +187,7 @@ func readPipeMsg(input io.Reader) (msg *PipeMessage, err error) {
 		return nil, err
 	}
 	msg.Type = msgType
-	msg.Text = string(msgBuffer)
+	msg.Text = strings.TrimSuffix(string(msgBuffer), "\x00")
 
 	if msgType == DropCountMsg {
 		i, err := strconv.ParseUint(msg.Text, 10, 0)
@@ -220,8 +218,13 @@ func waitForSuccessMsg(input io.Reader) error {
 	if err != nil {
 		return err
 	}
-	if msg.Type != SuccessMsg {
-		return errors.New("Unexpected message from dumpcap: " + string(msg.Type))
+	switch msg.Type {
+	case SuccessMsg:
+		return nil
+	case ErrMsg, BadFilterMsg:
+		return errors.New(msg.Text)
+	default:
+		return errors.New("unexpected message from dumpcap: " + string(msg.Type))
 	}
 	return nil
 }

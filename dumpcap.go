@@ -147,7 +147,10 @@ type Arguments struct {
 // buildArgs serializes a struct of Arguments into a []string ready to be
 // passed as commandline arguments to dumpcap.
 func (a Arguments) buildArgs() []string {
-	r := []string{a.command}
+	var r []string
+	if a.command != "" {
+		r = []string{a.command}
+	}
 
 	intArg := func(v uint64, a string) {
 		if v != 0 {
@@ -216,6 +219,10 @@ func (a Arguments) buildArgs() []string {
 	}
 
 	return r
+}
+
+func (a Arguments) String() string {
+	return strings.Join(a.buildArgs(), " ")
 }
 
 // Version returns the first line "dumpcap -v" gives.
