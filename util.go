@@ -17,7 +17,7 @@ var deviceListRE = regexp.MustCompile(`(?m:^)` +
 	`(\d+)\t` + // the interface type
 	`([a-fA-F0-9\.:,]*)\t` + // known addresses
 	`(\w+)` + // "loopback" or "network"
-	`(?m:$)` + // newline
+	`(?m:\r?$)` + // newline
 	``)
 
 // The message headers that might arrive from dumpcap.
